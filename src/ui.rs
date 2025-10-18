@@ -110,68 +110,88 @@ fn render_filter_buttons(f: &mut Frame, app: &AppState, area: Rect) {
     }
 }
 
-/// Render field guide as 3-column grid
+/// Render field guide as 3-column grid using Layout constraints
 fn render_field_guide_grid(f: &mut Frame, app: &AppState, area: Rect) {
     let state = &app.field_guide;
     let filtered = state.filtered_sections();
 
-    // Calculate grid: 3 columns
-    let col_width = (area.width - 2) / 3;
-    let col_height = (area.height - 1) / 4; // Rough estimate for 4 rows
+    // Split into rows of 3 columns
+    let mut row_y = area.y;
+    let mut remaining_sections = filtered.clone();
 
-    let mut col = 0;
-    let mut row = 0;
+    while !remaining_sections.is_empty() && row_y < area.bottom() {
+        // Take up to 3 sections for this row
+        let row_sections: Vec<usize> = remaining_sections.drain(0..remaining_sections.len().min(3)).collect();
+        let row_height = area.bottom() - row_y - 1; // Leave space for next row
 
-    for &section_idx in &filtered {
-        let section = &state.data.sections[section_idx];
-        let is_selected = state.selected_section_idx == section_idx;
+        // Calculate equal widths for columns
+        let col_widths: Vec<u16> = vec![
+            (area.width - 2) / 3; // Each column gets 1/3 of width minus margins
+            row_sections.len()
+        ];
 
-        // Calculate position
-        let x = area.x + (col as u16 * (col_width + 1));
-        let y = area.y + (row as u16 * (col_height + 1));
+        // Create column areas using Layout
+        let col_areas = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                col_widths
+                    .iter()
+                    .map(|&w| Constraint::Length(w))
+                    .collect::<Vec<_>>()
+            )
+            .split(Rect {
+                x: area.x + 1,
+                y: row_y,
+                width: area.width.saturating_sub(2),
+                height: row_height.min(6), // Cards are 6 lines tall
+            });
 
-        let card_area = Rect {
-            x,
-            y,
-            width: col_width,
-            height: col_height,
-        };
+        // Render each card in this row
+        for (col_idx, &section_idx) in row_sections.iter().enumerate() {
+            if col_idx >= col_areas.len() {
+                break;
+            }
 
-        // Render card
-        let color = color_from_string(&section.color);
-        let border_style = if is_selected {
-            Style::default().fg(Color::White).add_modifier(Modifier::BOLD)
-        } else {
-            Style::default().fg(color)
-        };
+            let section = &state.data.sections[section_idx];
+            let is_selected = state.selected_section_idx == section_idx;
+            let color = color_from_string(&section.color);
 
-        let card_block = Block::default()
-            .title(format!(" {} ", &section.title))
-            .borders(Borders::ALL)
-            .style(border_style);
+            // Card styling
+            let border_style = if is_selected {
+                Style::default().fg(Color::White).add_modifier(Modifier::BOLD)
+            } else {
+                Style::default().fg(color)
+            };
 
-        f.render_widget(card_block, card_area);
+            let card_block = Block::default()
+                .title(format!(" {} ", &section.title))
+                .borders(Borders::ALL)
+                .style(border_style);
 
-        // Content inside card
-        let inner_margin = ratatui::layout::Margin {
-            vertical: 1,
-            horizontal: 1,
-        };
-        let inner = card_area.inner(inner_margin);
+            let card_area = col_areas[col_idx];
+            f.render_widget(card_block.clone(), card_area);
 
-        let content = format!("Entries: {}\nType: {}", section.entries.len(), section.icon.to_uppercase());
-        let content_para = Paragraph::new(content)
-            .style(Style::default().fg(color))
-            .alignment(Alignment::Left);
+            // Content inside card
+            let inner = card_area.inner(ratatui::layout::Margin {
+                vertical: 1,
+                horizontal: 1,
+            });
 
-        f.render_widget(content_para, inner);
+            let content = vec![
+                format!("📦 {} entries", section.entries.len()),
+                format!("🔷 {}", section.icon.to_uppercase()),
+            ]
+            .join("\n");
 
-        // Move to next position
-        col += 1;
-        if col >= 3 {
-            col = 0;
-            row += 1;
+            let content_para = Paragraph::new(content)
+                .style(Style::default().fg(color))
+                .alignment(Alignment::Left)
+                .wrap(Wrap { trim: true });
+
+            f.render_widget(content_para, inner);
         }
+
+        row_y += 7; // Move down for next row (6 for card + 1 for spacing)
     }
 }
 
@@ -226,18 +246,17 @@ fn render_sanctuary(f: &mut Frame, app: &AppState, area: Rect) {
     f.render_widget(footer, chunks[2]);
 }
 
-/// Render programs and records list
+/// Render programs and records list with better layout
 fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
     let state = &app.sanctuary;
 
-    // Tab navigation
-    let tab_area = Rect {
-        x: area.x,
-        y: area.y,
-        width: area.width,
-        height: 3,
-    };
+    // Use Layout for proper sectioning
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Length(3), Constraint::Min(5)])
+        .split(area);
 
+    // ===== TAB NAVIGATION =====
     let mut tab_line = vec![];
     for (i, program) in state.data.programs.iter().enumerate() {
         let is_active = state.active_program_idx == i;
@@ -245,7 +264,7 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
 
         if is_active {
             tab_line.push(Span::styled(
-                format!(" {} ", &program.title),
+                format!("  {}  ", &program.title),
                 Style::default()
                     .fg(Color::Black)
                     .bg(color)
@@ -253,8 +272,8 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
             ));
         } else {
             tab_line.push(Span::styled(
-                format!(" {} ", &program.title),
-                Style::default().fg(color).add_modifier(Modifier::DIM),
+                format!("  {}  ", &program.title),
+                Style::default().fg(color),
             ));
         }
 
@@ -264,18 +283,11 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
     }
 
     let tabs = Paragraph::new(Line::from(tab_line))
-        .block(Block::default().borders(Borders::BOTTOM))
+        .block(Block::default().borders(Borders::BOTTOM).style(Style::default().fg(Color::DarkGray)))
         .alignment(Alignment::Left);
-    f.render_widget(tabs, tab_area);
+    f.render_widget(tabs, chunks[0]);
 
-    // Records list
-    let records_area = Rect {
-        x: area.x,
-        y: area.y + 3,
-        width: area.width,
-        height: area.height - 3,
-    };
-
+    // ===== RECORDS LIST =====
     if let Some(program) = state.current_program() {
         let records: Vec<ListItem> = program
             .records
@@ -283,6 +295,13 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
             .enumerate()
             .map(|(i, record)| {
                 let is_selected = state.selected_record_idx == i;
+
+                let status_symbol = match record.status {
+                    crate::models::RecordStatus::Operational => "✓",
+                    crate::models::RecordStatus::Caution => "⚠",
+                    crate::models::RecordStatus::Degraded => "⚡",
+                    crate::models::RecordStatus::Critical => "✗",
+                };
 
                 let status_color = match record.status {
                     crate::models::RecordStatus::Operational => Color::Green,
@@ -300,15 +319,19 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
                     Style::default().fg(status_color)
                 };
 
-                let label = format!("[{}] {}", record.status, record.name);
+                let label = format!(" {} {}", status_symbol, record.name);
                 ListItem::new(Line::from(Span::styled(label, style)))
             })
             .collect();
 
         let record_list = List::new(records)
-            .block(Block::default().title(" Records ").borders(Borders::ALL));
+            .block(
+                Block::default()
+                    .title(format!(" Records ({}) ", program.records.len()))
+                    .borders(Borders::ALL),
+            );
 
-        f.render_widget(record_list, records_area);
+        f.render_widget(record_list, chunks[1]);
     }
 }
 
