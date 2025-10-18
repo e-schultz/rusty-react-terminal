@@ -56,7 +56,7 @@ fn render_field_guide(f: &mut Frame, app: &AppState, area: Rect) {
 
     // ===== FOOTER =====
     let footer_text = format!(
-        "Total: {} | Filter: {} | [h/l] Nav | [j/k] Entry | [Enter] Details | [:] Command | [Tab] Sanctuary",
+        "Total: {} | Filter: {} | [1-7] Filter | [0] Clear | [h/l] Nav | [j/k] Entry | [Enter] Details | [:] Command",
         app.field_guide.data.sections.len(),
         app.field_guide
             .active_filter

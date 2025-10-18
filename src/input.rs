@@ -111,8 +111,27 @@ fn handle_field_guide_input(app: &mut AppState, key: KeyEvent) {
         KeyCode::Enter => {
             app.field_guide.viewing_details = !app.field_guide.viewing_details;
         }
-        KeyCode::Char('f') => {
-            // Cycle through filters (this would be a command palette thing in real app)
+        // Filter selection by number: 1-7 for colors, 0 to clear
+        KeyCode::Char('1') => {
+            app.field_guide.toggle_filter("cyan".to_string());
+        }
+        KeyCode::Char('2') => {
+            app.field_guide.toggle_filter("purple".to_string());
+        }
+        KeyCode::Char('3') => {
+            app.field_guide.toggle_filter("green".to_string());
+        }
+        KeyCode::Char('4') => {
+            app.field_guide.toggle_filter("amber".to_string());
+        }
+        KeyCode::Char('5') => {
+            app.field_guide.toggle_filter("blue".to_string());
+        }
+        KeyCode::Char('6') => {
+            app.field_guide.toggle_filter("teal".to_string());
+        }
+        KeyCode::Char('7') => {
+            app.field_guide.toggle_filter("rose".to_string());
         }
         KeyCode::Char('0') => {
             app.field_guide.active_filter = None;
