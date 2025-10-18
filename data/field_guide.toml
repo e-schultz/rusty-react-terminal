@@ -1,0 +1,162 @@
+[meta]
+title = "Evan's Day Field Guide"
+subtitle = "Brain Boot → Work Mode Operational Patterns"
+version = "1.2"
+context = "Ritual Stack | Context continuity > seamlessness"
+date = "2025-09-10"
+
+[[sections]]
+id = "morning-brain-boot"
+title = "Morning Brain Boot Sequence"
+icon = "scan"
+color = "cyan"
+
+[[sections.entries]]
+pattern = "Context Archaeology"
+description = "Load recent threads/logs to reattach narrative continuity."
+signals = ["Post-wake fuzz", "What was I doing?", "Fragmented recall"]
+protocol = "Open yesterday's log → scan last 5 anchors → note active workstream."
+
+[[sections.entries]]
+pattern = "Meeting Preparation"
+description = "Pre-flight timing and agenda alignment."
+signals = ["Back-to-back calls", "Agenda drift", "Unclear asks"]
+protocol = "2-min agenda skim → write 1-liner goal → timebox follow-ups."
+
+[[sections.entries]]
+pattern = "Air Quality Protocol"
+description = "Environmental tune for cognition (light, airflow, hydration)."
+signals = ["Eye fatigue", "Heavy head", "Reading stalls"]
+protocol = "Open window/fan → adjust lighting → hydrate 300ml."
+
+[[sections]]
+id = "hat-management"
+title = "Hat Management Protocols"
+icon = "hat"
+color = "purple"
+
+[[sections.entries]]
+pattern = "Karen's Passenger List Doctrine"
+description = "Boundary enforcement: name the hat, work for that hat."
+signals = ["Role confusion mid-task", "Personal→work bleed", "Multiple contexts open"]
+protocol = "Say hat aloud → write top task for that hat → switch explicitly."
+
+[[sections.entries]]
+pattern = "Personal Tools Hat"
+description = "Avoid drifting into meta/tool-tending during execution."
+signals = ["Teaching AI my setup", "Scaffold over-engineering", "Instruction mode"]
+protocol = "Note the impulse → dispatch:later → return to task."
+
+[[sections.entries]]
+pattern = "Claude Educator Hat"
+description = "Reserve pedagogy for teaching blocks; not during work sprints."
+signals = ["Explaining while coding", "Tutorial voice emerges"]
+protocol = "Park explainer as note → continue sprint → schedule teach block."
+
+[[sections]]
+id = "work-transitions"
+title = "Work Transition Patterns"
+icon = "zap"
+color = "green"
+
+[[sections.entries]]
+pattern = "Brain Boot → Body Engage"
+description = "Move the body to lock in cognition."
+signals = ["Abstract float", "Prolonged sitting", "Somatic numbness"]
+protocol = "3–5 min walk/stretch → resume with first keystroke task."
+
+[[sections.entries]]
+pattern = "Timing Awareness"
+description = "Pre-meeting pacing that prevents scramble."
+signals = ["Last-minute prep", "Calendar ping panic"]
+protocol = "T-10: open doc → T-5: write outcome → T-2: breathe."
+
+[[sections.entries]]
+pattern = "Trust the Drift"
+description = "Allow natural focus within time boundaries."
+signals = ["Forcing control", "Context thrash"]
+protocol = "Set 25–50 min lane → let flow pick the subtask → stop on timer."
+
+[[sections]]
+id = "implementation-planning"
+title = "Implementation Planning"
+icon = "square"
+color = "amber"
+
+[[sections.entries]]
+pattern = "Solve for Us(Evan)"
+description = "Design for personal viability before team scale."
+signals = ["Do we need this? pushback", "Consensus tax"]
+protocol = "Ship personal command in $HOME → document → consider scale later."
+
+[[sections.entries]]
+pattern = "Shacks, Not Cathedrals"
+description = "Extend small working structures; avoid overbuild."
+signals = ["Speculative architecture urge", "Tool sprawl"]
+protocol = "Add one command/hook → test in real use → iterate."
+
+[[sections.entries]]
+pattern = "Leverage Existing Infra"
+description = "Use Chroma/Evna/MCP; avoid net-new services."
+signals = ["Greenfield temptation", "Parallel systems"]
+protocol = "Map need → reuse existing primitive → note gaps."
+
+[[sections]]
+id = "context-management"
+title = "Context Management"
+icon = "repeat"
+color = "blue"
+
+[[sections.entries]]
+pattern = "Copy-Paste Ritual"
+description = "Manual continuity beats brittle magic."
+signals = ["Tool memory mismatch", "Lost thread"]
+protocol = "Paste last anchor into new chat/doc → proceed."
+
+[[sections.entries]]
+pattern = "Thrash Detector"
+description = "Heavy logging may indicate overwhelm, not progress."
+signals = ["High-volume dumps", "Incoherent threads"]
+protocol = "Tag as eject → pause ingestion → resume after reset."
+
+[[sections.entries]]
+pattern = "Smart Pattern Balance"
+description = "Minimal metadata + natural language; avoid soup."
+signals = ["Over-annotation", "Poor searchability"]
+protocol = "Keep essential routes only → prefer plain sentences."
+
+[[sections]]
+id = "somatic-regulation"
+title = "Somatic & Sensory Regulation"
+icon = "circle"
+color = "teal"
+
+[[sections.entries]]
+pattern = "Rolling Brownout Watch"
+description = "Shorter intervals between mini-burnouts."
+signals = ["Task avoidance", "Energy crashes", "Irritability"]
+protocol = "Scale workload down one notch for 24–48h; protect sleep/food."
+
+[[sections.entries]]
+pattern = "Vision FU-O Clock"
+description = "Eyes tap out; reading stalls."
+signals = ["Blur/strain", "Skimming loop"]
+protocol = "Dim screen → 5 min off-screen → resume audio/walk."
+
+[[sections.entries]]
+pattern = "Embodied Reset"
+description = "Dance/walk/floor time as nervous-system hygiene."
+signals = ["Static → feels", "Tight chest"]
+protocol = "One song dance or 7-min walk → re-enter."
+
+[[sections]]
+id = "pedagogy-collab"
+title = "AI Pedagogy & Collaboration"
+icon = "book-open"
+color = "rose"
+
+[[sections.entries]]
+pattern = "Contextual Teaching Load"
+description = "Teaching AI in-situ is real work, not overhead."
+signals = ["Friction while pairing", "Explainer time creep"]
+protocol = "Timebox pedagogy separately; capture examples; reuse prompts."

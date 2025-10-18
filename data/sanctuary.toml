@@ -1,0 +1,180 @@
+[meta]
+title = "Glitch Sanctuary Protocols"
+subtitle = "System Maintenance & Recovery Procedures"
+version = "0.9.7b"
+status = "UNSTABLE"
+
+[metrics]
+focus = 68
+energy = 42
+stability = 75
+creativity = 89
+last_reset = "3d 7h 22m ago"
+
+[[programs]]
+id = "reset-sequence"
+title = "Reset Sequence"
+icon = "power-cycle"
+color = "cyan"
+
+[[programs.records]]
+id = "rs-001"
+name = "Power Cycle Protocol"
+description = "Complete system shutdown and restart procedure"
+steps = [
+  "Terminate all background processes",
+  "Save state to temporary buffer",
+  "Initiate 5-minute complete disconnect",
+  "Reboot with minimal services"
+]
+status = "OPERATIONAL"
+
+[[programs.records]]
+id = "rs-002"
+name = "Memory Flush"
+description = "Clear temporary memory buffers and cache"
+steps = [
+  "Identify thought loops and rumination patterns",
+  "Document for later analysis",
+  "Execute rapid context switch",
+  "Perform grounding exercise"
+]
+status = "CAUTION"
+
+[[programs.records]]
+id = "rs-003"
+name = "Sensory Recalibration"
+description = "Reset sensory processing thresholds"
+steps = [
+  "Reduce input channels to minimum",
+  "Establish baseline readings",
+  "Gradually reintroduce stimuli",
+  "Monitor for overload indicators"
+]
+status = "OPERATIONAL"
+
+[[programs]]
+id = "sanctuary-modes"
+title = "Sanctuary Modes"
+icon = "shield"
+color = "purple"
+
+[[programs.records]]
+id = "sm-001"
+name = "Null Space"
+description = "Zero input environment for system recovery"
+steps = [
+  "Locate quiet physical space",
+  "Disable notifications and alerts",
+  "Set timer for 15-30 minutes",
+  "Focus on breath as anchor point"
+]
+status = "OPERATIONAL"
+
+[[programs.records]]
+id = "sm-002"
+name = "Flow Channel"
+description = "Guided focus state for maximum stability"
+steps = [
+  "Select single task with clear parameters",
+  "Eliminate all non-essential processes",
+  "Establish rhythm through consistent action",
+  "Maintain until natural completion point"
+]
+status = "OPERATIONAL"
+
+[[programs.records]]
+id = "sm-003"
+name = "Safe Mode"
+description = "Minimal functionality during overload events"
+steps = [
+  "Acknowledge system overload",
+  "Cancel non-critical commitments",
+  "Execute basic self-maintenance only",
+  "Gradually test stability before resuming"
+]
+status = "CAUTION"
+
+[[programs]]
+id = "glitch-handling"
+title = "Glitch Handling"
+icon = "debug"
+color = "amber"
+
+[[programs.records]]
+id = "gh-001"
+name = "Thought Loop Interrupt"
+description = "Break recursive thinking patterns"
+steps = [
+  "Identify loop entry point",
+  "Label process as looping",
+  "Introduce pattern interrupt",
+  "Redirect to predefined safe task"
+]
+status = "OPERATIONAL"
+
+[[programs.records]]
+id = "gh-002"
+name = "Error Trace"
+description = "Identify source of system instability"
+steps = [
+  "Log current state and triggers",
+  "Trace backward to initial deviation",
+  "Identify environmental factors",
+  "Document for pattern recognition"
+]
+status = "DEGRADED"
+
+[[programs.records]]
+id = "gh-003"
+name = "Emotional Buffer Overflow"
+description = "Handle emotional processing stack issues"
+steps = [
+  "Acknowledge buffer state",
+  "Create temporary external storage (journal)",
+  "Process in small controlled batches",
+  "Implement timeout periods between processing"
+]
+status = "CAUTION"
+
+[[programs]]
+id = "maintenance"
+title = "Maintenance"
+icon = "tools"
+color = "green"
+
+[[programs.records]]
+id = "mt-001"
+name = "Sleep Optimization"
+description = "Ensure proper system downtime and recovery"
+steps = [
+  "Establish consistent shutdown times",
+  "Implement 30-min pre-sleep protocol",
+  "Monitor sleep quality metrics",
+  "Adjust environment variables as needed"
+]
+status = "DEGRADED"
+
+[[programs.records]]
+id = "mt-002"
+name = "Resource Allocation"
+description = "Balance system resources for optimal function"
+steps = [
+  "Audit current commitments and tasks",
+  "Calculate available processing capacity",
+  "Prioritize based on system goals",
+  "Schedule mandatory idle periods"
+]
+status = "OPERATIONAL"
+
+[[programs.records]]
+id = "mt-003"
+name = "Input Filtering"
+description = "Manage information and stimuli intake"
+steps = [
+  "Set boundaries on information sources",
+  "Schedule specific intake periods",
+  "Implement quality filters",
+  "Process in batches rather than streams"
+]
+status = "OPERATIONAL"
