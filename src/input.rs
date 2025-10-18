@@ -80,18 +80,34 @@ fn handle_view_input(app: &mut AppState, key: KeyEvent) {
 /// Handle input for the Field Guide view
 fn handle_field_guide_input(app: &mut AppState, key: KeyEvent) {
     match key.code {
+        // Horizontal navigation (left/right or h/l)
         KeyCode::Left | KeyCode::Char('h') => {
             app.field_guide.prev_section();
         }
         KeyCode::Right | KeyCode::Char('l') => {
             app.field_guide.next_section();
         }
-        KeyCode::Up | KeyCode::Char('k') => {
+        // Vertical navigation (up/down or k/j) or scrolling (Ctrl+k/j, Page Up/Down)
+        KeyCode::Up | KeyCode::Char('k') if !key.modifiers.contains(KeyModifiers::CONTROL) => {
             app.field_guide.prev_entry();
         }
-        KeyCode::Down | KeyCode::Char('j') => {
+        KeyCode::Down | KeyCode::Char('j') if !key.modifiers.contains(KeyModifiers::CONTROL) => {
             app.field_guide.next_entry();
         }
+        // Page scrolling with Ctrl+j/k or Page Down/Up
+        KeyCode::Char('j') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+            app.field_guide.scroll_down();
+        }
+        KeyCode::Char('k') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+            app.field_guide.scroll_up();
+        }
+        KeyCode::PageDown => {
+            app.field_guide.scroll_down();
+        }
+        KeyCode::PageUp => {
+            app.field_guide.scroll_up();
+        }
+        // Detail view and filters
         KeyCode::Enter => {
             app.field_guide.viewing_details = !app.field_guide.viewing_details;
         }
@@ -108,18 +124,34 @@ fn handle_field_guide_input(app: &mut AppState, key: KeyEvent) {
 /// Handle input for the Glitch Sanctuary view
 fn handle_sanctuary_input(app: &mut AppState, key: KeyEvent) {
     match key.code {
+        // Horizontal navigation (left/right or h/l) for program switching
         KeyCode::Left | KeyCode::Char('h') => {
             app.sanctuary.prev_program();
         }
         KeyCode::Right | KeyCode::Char('l') => {
             app.sanctuary.next_program();
         }
-        KeyCode::Up | KeyCode::Char('k') => {
+        // Vertical navigation (up/down or k/j) or scrolling (Ctrl+k/j, Page Up/Down)
+        KeyCode::Up | KeyCode::Char('k') if !key.modifiers.contains(KeyModifiers::CONTROL) => {
             app.sanctuary.prev_record();
         }
-        KeyCode::Down | KeyCode::Char('j') => {
+        KeyCode::Down | KeyCode::Char('j') if !key.modifiers.contains(KeyModifiers::CONTROL) => {
             app.sanctuary.next_record();
         }
+        // Page scrolling with Ctrl+j/k or Page Down/Up
+        KeyCode::Char('j') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+            app.sanctuary.scroll_records_down();
+        }
+        KeyCode::Char('k') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+            app.sanctuary.scroll_records_up();
+        }
+        KeyCode::PageDown => {
+            app.sanctuary.scroll_records_down();
+        }
+        KeyCode::PageUp => {
+            app.sanctuary.scroll_records_up();
+        }
+        // Detail view toggle
         KeyCode::Enter => {
             if app.sanctuary.current_program().is_some() {
                 app.sanctuary

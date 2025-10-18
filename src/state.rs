@@ -8,6 +8,7 @@ pub struct FieldGuideState {
     pub selected_entry_idx: usize,
     pub active_filter: Option<String>, // None = no filter, Some(color) = filter by color
     pub viewing_details: bool,         // Whether we're viewing entry details
+    pub scroll_offset: usize,          // Vertical scroll offset for grid (in rows of 3)
 }
 
 impl FieldGuideState {
@@ -18,6 +19,7 @@ impl FieldGuideState {
             selected_entry_idx: 0,
             active_filter: None,
             viewing_details: false,
+            scroll_offset: 0,
         }
     }
 
@@ -91,6 +93,35 @@ impl FieldGuideState {
         }
         self.selected_section_idx = 0;
         self.selected_entry_idx = 0;
+        self.scroll_offset = 0;
+    }
+
+    /// Scroll down by one row (3 sections per row)
+    pub fn scroll_down(&mut self) {
+        let filtered = self.filtered_sections();
+        let total_rows = (filtered.len() + 2) / 3; // Ceiling division
+        if self.scroll_offset + 1 < total_rows {
+            self.scroll_offset += 1;
+        }
+    }
+
+    /// Scroll up by one row
+    pub fn scroll_up(&mut self) {
+        if self.scroll_offset > 0 {
+            self.scroll_offset -= 1;
+        }
+    }
+
+    /// Get visible sections based on scroll offset (max 3 sections per row)
+    pub fn visible_sections(&self) -> Vec<usize> {
+        let filtered = self.filtered_sections();
+        let start = self.scroll_offset * 3;
+        let end = (start + 3).min(filtered.len());
+        if start >= filtered.len() {
+            vec![]
+        } else {
+            filtered[start..end].to_vec()
+        }
     }
 }
 
@@ -101,6 +132,7 @@ pub struct SanctuaryState {
     pub active_program_idx: usize,
     pub selected_record_idx: usize,
     pub expanded_record_idx: Option<usize>,
+    pub record_scroll_offset: usize,  // Vertical scroll offset for records list
 }
 
 impl SanctuaryState {
@@ -110,6 +142,7 @@ impl SanctuaryState {
             active_program_idx: 0,
             selected_record_idx: 0,
             expanded_record_idx: None,
+            record_scroll_offset: 0,
         }
     }
 
@@ -130,6 +163,7 @@ impl SanctuaryState {
         if self.active_program_idx + 1 < self.data.programs.len() {
             self.active_program_idx += 1;
             self.selected_record_idx = 0;
+            self.record_scroll_offset = 0;
         }
     }
 
@@ -137,6 +171,7 @@ impl SanctuaryState {
         if self.active_program_idx > 0 {
             self.active_program_idx -= 1;
             self.selected_record_idx = 0;
+            self.record_scroll_offset = 0;
         }
     }
 
@@ -160,6 +195,27 @@ impl SanctuaryState {
         } else {
             self.expanded_record_idx = Some(idx);
         }
+    }
+
+    /// Scroll down in records list
+    pub fn scroll_records_down(&mut self) {
+        if let Some(program) = self.current_program() {
+            if self.record_scroll_offset + 1 < program.records.len() {
+                self.record_scroll_offset += 1;
+            }
+        }
+    }
+
+    /// Scroll up in records list
+    pub fn scroll_records_up(&mut self) {
+        if self.record_scroll_offset > 0 {
+            self.record_scroll_offset -= 1;
+        }
+    }
+
+    /// Reset scroll offset when switching programs
+    pub fn reset_scroll_offset(&mut self) {
+        self.record_scroll_offset = 0;
     }
 }
 

@@ -110,16 +110,43 @@ fn render_filter_buttons(f: &mut Frame, app: &AppState, area: Rect) {
     }
 }
 
-/// Render field guide as 3-column grid using Layout constraints
+/// Render field guide as 3-column grid using Layout constraints with scrolling
 fn render_field_guide_grid(f: &mut Frame, app: &AppState, area: Rect) {
     let state = &app.field_guide;
     let filtered = state.filtered_sections();
 
-    // Split into rows of 3 columns
-    let mut row_y = area.y;
-    let mut remaining_sections = filtered.clone();
+    // Calculate total rows needed and current viewport
+    let total_rows = (filtered.len() + 2) / 3; // Ceiling division for rows of 3
+    let max_visible_rows = (area.height as usize) / 7; // 7 lines per row (6 card + 1 spacing)
 
-    while !remaining_sections.is_empty() && row_y < area.bottom() {
+    // Show scroll indicator if content exceeds viewport
+    if total_rows > max_visible_rows && state.scroll_offset > 0 {
+        // Scroll indicator (⬆ for scroll up available)
+        let scroll_up_text = "⬆ scroll up";
+        let scroll_up = Paragraph::new(scroll_up_text)
+            .style(Style::default().fg(Color::DarkGray).add_modifier(Modifier::DIM))
+            .alignment(Alignment::Right);
+        f.render_widget(scroll_up, Rect {
+            x: area.right().saturating_sub(scroll_up_text.len() as u16 + 1),
+            y: area.y,
+            width: scroll_up_text.len() as u16,
+            height: 1,
+        });
+    }
+
+    // Split into rows of 3 columns, starting from scroll offset
+    let mut row_y = area.y;
+    let start_offset = state.scroll_offset * 3;
+    let visible_sections: Vec<usize> = filtered
+        .iter()
+        .skip(start_offset)
+        .take(max_visible_rows * 3)
+        .copied()
+        .collect();
+
+    let mut remaining_sections = visible_sections;
+
+    while !remaining_sections.is_empty() && row_y < area.bottom().saturating_sub(1) {
         // Take up to 3 sections for this row
         let row_sections: Vec<usize> = remaining_sections.drain(0..remaining_sections.len().min(3)).collect();
         let row_height = area.bottom() - row_y - 1; // Leave space for next row
@@ -192,6 +219,20 @@ fn render_field_guide_grid(f: &mut Frame, app: &AppState, area: Rect) {
         }
 
         row_y += 7; // Move down for next row (6 for card + 1 for spacing)
+    }
+
+    // Show scroll down indicator if more content below
+    if state.scroll_offset + max_visible_rows < total_rows && row_y < area.bottom() {
+        let scroll_down_text = "⬇ scroll down";
+        let scroll_down = Paragraph::new(scroll_down_text)
+            .style(Style::default().fg(Color::DarkGray).add_modifier(Modifier::DIM))
+            .alignment(Alignment::Right);
+        f.render_widget(scroll_down, Rect {
+            x: area.right().saturating_sub(scroll_down_text.len() as u16 + 1),
+            y: area.bottom().saturating_sub(2),
+            width: scroll_down_text.len() as u16,
+            height: 1,
+        });
     }
 }
 
