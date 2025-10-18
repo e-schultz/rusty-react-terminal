@@ -2,7 +2,7 @@ use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Gauge, List, ListItem, Paragraph, Wrap},
+    widgets::{Block, Borders, Gauge, List, ListItem, Paragraph, Scrollbar, ScrollbarOrientation, Wrap},
     Frame,
 };
 
@@ -233,6 +233,21 @@ fn render_field_guide_grid(f: &mut Frame, app: &AppState, area: Rect) {
             width: scroll_down_text.len() as u16,
             height: 1,
         });
+    }
+
+    // Render scrollbar on the right side if content overflows
+    if total_rows > max_visible_rows {
+        let scrollbar_area = Rect {
+            x: area.right().saturating_sub(1),
+            y: area.y + 1, // Below title area
+            width: 1,
+            height: area.height.saturating_sub(3), // Account for title and footer
+        };
+        f.render_stateful_widget(
+            Scrollbar::new(ScrollbarOrientation::VerticalRight),
+            scrollbar_area,
+            &mut state.scrollbar_state.clone(),
+        );
     }
 }
 

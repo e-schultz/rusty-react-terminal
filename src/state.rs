@@ -1,4 +1,5 @@
 use crate::models::{FieldGuideData, GlitchSanctuaryData, View};
+use ratatui::widgets::ScrollbarState;
 
 /// Field Guide UI state
 #[derive(Debug, Clone)]
@@ -9,6 +10,7 @@ pub struct FieldGuideState {
     pub active_filter: Option<String>, // None = no filter, Some(color) = filter by color
     pub viewing_details: bool,         // Whether we're viewing entry details
     pub scroll_offset: usize,          // Vertical scroll offset for grid (in rows of 3)
+    pub scrollbar_state: ScrollbarState, // For rendering visual scrollbar
 }
 
 impl FieldGuideState {
@@ -20,6 +22,7 @@ impl FieldGuideState {
             active_filter: None,
             viewing_details: false,
             scroll_offset: 0,
+            scrollbar_state: ScrollbarState::default(),
         }
     }
 
@@ -103,6 +106,7 @@ impl FieldGuideState {
         if self.scroll_offset + 1 < total_rows {
             self.scroll_offset += 1;
         }
+        self.update_scrollbar_state();
     }
 
     /// Scroll up by one row
@@ -110,6 +114,16 @@ impl FieldGuideState {
         if self.scroll_offset > 0 {
             self.scroll_offset -= 1;
         }
+        self.update_scrollbar_state();
+    }
+
+    /// Update scrollbar state to reflect current scroll position
+    pub fn update_scrollbar_state(&mut self) {
+        let filtered = self.filtered_sections();
+        let total_rows = (filtered.len() + 2) / 3; // Ceiling division
+        self.scrollbar_state = self.scrollbar_state
+            .content_length(total_rows)
+            .position(self.scroll_offset);
     }
 
     /// Get visible sections based on scroll offset (max 3 sections per row)
@@ -133,6 +147,7 @@ pub struct SanctuaryState {
     pub selected_record_idx: usize,
     pub expanded_record_idx: Option<usize>,
     pub record_scroll_offset: usize,  // Vertical scroll offset for records list
+    pub record_scrollbar_state: ScrollbarState, // For rendering visual scrollbar
 }
 
 impl SanctuaryState {
@@ -143,6 +158,7 @@ impl SanctuaryState {
             selected_record_idx: 0,
             expanded_record_idx: None,
             record_scroll_offset: 0,
+            record_scrollbar_state: ScrollbarState::default(),
         }
     }
 
@@ -204,6 +220,7 @@ impl SanctuaryState {
                 self.record_scroll_offset += 1;
             }
         }
+        self.update_record_scrollbar_state();
     }
 
     /// Scroll up in records list
@@ -211,11 +228,25 @@ impl SanctuaryState {
         if self.record_scroll_offset > 0 {
             self.record_scroll_offset -= 1;
         }
+        self.update_record_scrollbar_state();
     }
 
     /// Reset scroll offset when switching programs
     pub fn reset_scroll_offset(&mut self) {
         self.record_scroll_offset = 0;
+        self.update_record_scrollbar_state();
+    }
+
+    /// Update record scrollbar state to reflect current scroll position
+    pub fn update_record_scrollbar_state(&mut self) {
+        let content_length = if let Some(program) = self.current_program() {
+            program.records.len()
+        } else {
+            0
+        };
+        self.record_scrollbar_state = self.record_scrollbar_state
+            .content_length(content_length)
+            .position(self.record_scroll_offset);
     }
 }
 
