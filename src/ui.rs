@@ -357,10 +357,19 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
 
     // ===== RECORDS LIST =====
     if let Some(program) = state.current_program() {
-        let records: Vec<ListItem> = program
+        // Calculate visible records based on scroll offset
+        let max_visible_height = chunks[1].height.saturating_sub(2) as usize; // Account for borders
+        let offset = (state.record_scroll_offset).min(
+            program.records.len().saturating_sub(max_visible_height)
+        );
+
+        // Create visible records slice
+        let visible_records: Vec<ListItem> = program
             .records
             .iter()
             .enumerate()
+            .skip(offset)
+            .take(max_visible_height)
             .map(|(i, record)| {
                 let is_selected = state.selected_record_idx == i;
 
@@ -392,7 +401,7 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
             })
             .collect();
 
-        let record_list = List::new(records)
+        let record_list = List::new(visible_records)
             .block(
                 Block::default()
                     .title(format!(" Records ({}) ", program.records.len()))
@@ -400,6 +409,21 @@ fn render_sanctuary_programs(f: &mut Frame, app: &AppState, area: Rect) {
             );
 
         f.render_widget(record_list, chunks[1]);
+
+        // Render scrollbar if content overflows
+        if program.records.len() > max_visible_height {
+            let scrollbar_area = Rect {
+                x: chunks[1].right().saturating_sub(1),
+                y: chunks[1].y + 1, // Below top border
+                width: 1,
+                height: chunks[1].height.saturating_sub(2), // Account for borders
+            };
+            f.render_stateful_widget(
+                Scrollbar::new(ScrollbarOrientation::VerticalRight),
+                scrollbar_area,
+                &mut state.record_scrollbar_state.clone(),
+            );
+        }
     }
 }
 
