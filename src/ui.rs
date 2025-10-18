@@ -68,6 +68,11 @@ fn render_field_guide(f: &mut Frame, app: &AppState, area: Rect) {
         .style(Style::default().fg(Color::DarkGray))
         .alignment(Alignment::Left);
     f.render_widget(footer, chunks[2]);
+
+    // ===== DETAIL MODAL (if viewing details) =====
+    if app.field_guide.viewing_details {
+        render_entry_detail_modal(f, app);
+    }
 }
 
 /// Render filter buttons
@@ -300,6 +305,13 @@ fn render_sanctuary(f: &mut Frame, app: &AppState, area: Rect) {
         .style(Style::default().fg(Color::DarkGray))
         .alignment(Alignment::Left);
     f.render_widget(footer, chunks[2]);
+
+    // ===== DETAIL MODAL (if viewing details) =====
+    if let Some(expanded_idx) = app.sanctuary.expanded_record_idx {
+        if expanded_idx == app.sanctuary.selected_record_idx {
+            render_record_detail_modal(f, app);
+        }
+    }
 }
 
 /// Render programs and records list with better layout
@@ -475,6 +487,112 @@ fn render_command_palette(f: &mut Frame, app: &AppState, area: Rect) {
     let input_text = format!(": {}_", app.command_input);
     let prompt = Paragraph::new(input_text).style(Style::default().fg(Color::Green));
     f.render_widget(prompt, prompt_area);
+}
+
+/// Render a centered detail modal for entry/record information
+fn render_detail_modal(f: &mut Frame, title: &str, content_lines: Vec<String>, color: Color) {
+    let area = f.area();
+
+    // Calculate modal size (centered, 80% of available space)
+    let modal_width = (area.width as f32 * 0.8) as u16;
+    let modal_height = (content_lines.len() as u16 + 4).min(area.height - 2);
+
+    let modal_x = (area.width - modal_width) / 2;
+    let modal_y = (area.height - modal_height) / 2;
+
+    let modal_area = Rect {
+        x: modal_x,
+        y: modal_y,
+        width: modal_width,
+        height: modal_height,
+    };
+
+    // Create semi-transparent background by rendering a dark overlay
+    let bg_block = Block::default()
+        .style(Style::default().bg(Color::Black));
+    f.render_widget(bg_block, area);
+
+    // Create modal with content
+    let modal_block = Block::default()
+        .title(format!(" {} ", title))
+        .borders(Borders::ALL)
+        .style(Style::default().fg(color).add_modifier(Modifier::BOLD));
+
+    f.render_widget(modal_block, modal_area);
+
+    // Render content inside modal
+    let inner = modal_area.inner(ratatui::layout::Margin {
+        vertical: 1,
+        horizontal: 1,
+    });
+
+    let content_text = content_lines.join("\n");
+    let content_para = Paragraph::new(content_text)
+        .style(Style::default().fg(Color::White))
+        .wrap(Wrap { trim: true });
+
+    f.render_widget(content_para, inner);
+}
+
+/// Render entry detail modal for Field Guide
+fn render_entry_detail_modal(f: &mut Frame, app: &AppState) {
+    if let Some(section) = app.field_guide.current_section() {
+        if let Some(entry) = app.field_guide.current_entry() {
+            let color = color_from_string(&section.color);
+
+            let mut content = vec![
+                format!("Pattern: {}", entry.pattern),
+                String::new(),
+                "Description:".to_string(),
+                entry.description.clone(),
+                String::new(),
+            ];
+
+            if !entry.signals.is_empty() {
+                content.push("Signals:".to_string());
+                for signal in &entry.signals {
+                    content.push(format!("  • {}", signal));
+                }
+                content.push(String::new());
+            }
+
+            content.push(format!("Protocol: {}", entry.protocol));
+            content.push(String::new());
+            content.push("[Enter] Close | [j/k] Navigate entries".to_string());
+
+            render_detail_modal(f, &format!("{} - {}", section.title, entry.pattern), content, color);
+        }
+    }
+}
+
+/// Render record detail modal for Glitch Sanctuary
+fn render_record_detail_modal(f: &mut Frame, app: &AppState) {
+    if let Some(program) = app.sanctuary.current_program() {
+        if let Some(record) = app.sanctuary.current_record() {
+            let color = color_from_string(&program.color);
+
+            let mut content = vec![
+                format!("Name: {}", record.name),
+                format!("Status: {}", record.status),
+                String::new(),
+                "Description:".to_string(),
+                record.description.clone(),
+                String::new(),
+            ];
+
+            if !record.steps.is_empty() {
+                content.push("Steps:".to_string());
+                for (idx, step) in record.steps.iter().enumerate() {
+                    content.push(format!("  {}. {}", idx + 1, step));
+                }
+                content.push(String::new());
+            }
+
+            content.push("[Enter] Close | [j/k] Navigate records".to_string());
+
+            render_detail_modal(f, &format!("{} - {}", program.title, record.name), content, color);
+        }
+    }
 }
 
 /// Convert color string to ratatui Color
